@@ -1,8 +1,8 @@
 extends Node2D
 
 const Data = preload("res://scripts/game_data.gd")
-const GOLD = Color("e7bc75")
-const INK = Color("0c141c")
+const GOLD = Color("c69a3e")
+const INK = Color("0a080c")
 var rng = RandomNumberGenerator.new()
 var font: Font = SystemFont.new()
 var ui: CanvasLayer
@@ -45,6 +45,8 @@ var portal = false
 var portal_pos = Vector2.ZERO
 var camera_offset = Vector2.ZERO
 var inventory_open = false
+var hades: Node3D
+var pixel_cover: ColorRect
 
 func _ready() -> void:
 	rng.randomize()
@@ -56,19 +58,25 @@ func _ready() -> void:
 	keyed.shader = load("res://assets/art/chroma_key.gdshader")
 	material = keyed
 	font.font_names = PackedStringArray(["PingFang SC", "Microsoft YaHei", "Noto Sans CJK SC", "sans-serif"])
-	var pixel_layer = CanvasLayer.new()
-	pixel_layer.layer = 0
-	add_child(pixel_layer)
-	var pixel_cover = ColorRect.new()
-	pixel_cover.size = Vector2(1440, 900)
-	pixel_cover.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	var pixel_material = ShaderMaterial.new()
-	pixel_material.shader = load("res://assets/art/pixel_screen.gdshader")
-	pixel_cover.material = pixel_material
-	pixel_layer.add_child(pixel_cover)
+	# Fullscreen + screen-texture postprocess crashes GL Compatibility on some NVIDIA drivers.
+	pixel_cover = null
 	ui = CanvasLayer.new()
 	add_child(ui)
+	hades = preload("res://scripts/hades_world.gd").new()
+	hades.setup(self)
+	add_child(hades)
 	show_menu()
+
+func _notification(what: int) -> void:
+	# If the OS/driver already jumped into exclusive fullscreen, drop to borderless.
+	if what == NOTIFICATION_WM_SIZE_CHANGED or what == NOTIFICATION_APPLICATION_FOCUS_IN:
+		if DisplayServer.window_get_mode() == DisplayServer.WINDOW_MODE_EXCLUSIVE_FULLSCREEN:
+			DisplayServer.window_set_mode(DisplayServer.WINDOW_MODE_FULLSCREEN)
+
+func _shortcut_input(event: InputEvent) -> void:
+	if _is_fullscreen_toggle(event):
+		_toggle_fullscreen()
+		get_viewport().set_input_as_handled()
 
 func fresh_screen() -> void:
 	if is_instance_valid(screen):
@@ -122,10 +130,10 @@ func show_menu() -> void:
 	art.load_stage(0)
 	mode = "menu"
 	fresh_screen()
-	label_at("JOURNEY TO THE WEST   /   ROGUELIKE", Vector2(90, 60), 16, GOLD)
-	label_at("西游冒险", Vector2(85, 98), 68)
-	label_at("踏破六重天地，每一件宝物，都是新的可能。", Vector2(92, 193), 21, Color("93aaa9"))
-	label_at("01  /  选择行者", Vector2(92, 270), 18, GOLD)
+	label_at("CRIMSON COVENANT   /   HUNTER ROGUELIKE", Vector2(90, 60), 16, GOLD)
+	label_at("血契", Vector2(85, 98), 68)
+	label_at("猎人必须狩猎。六处猎场，每一件遗物，都是新的血契。", Vector2(92, 193), 21, Color("8a7a66"))
+	label_at("01  /  选择猎人", Vector2(92, 270), 18, GOLD)
 	for i in range(4):
 		var x = 90 + i * 320
 		panel(Rect2(x, 315, 300, 242), Color("111e28"))
@@ -141,16 +149,20 @@ func show_menu() -> void:
 		label_at(Data.HEROES[i].title, Vector2(x + 94, 348), 19, Data.HEROES[i].color)
 		label_at(Data.HEROES[i].desc, Vector2(x + 24, 395), 16, Color("9fb0b6"))
 		button_at(Data.HEROES[i].name + ("  ✓" if hero_id == i else "  →"), Rect2(x + 20, 483, 260, 52), func(): hero_id = i; show_menu(), hero_id == i)
-	label_at("02  /  冒险规则", Vector2(92, 596), 18, GOLD)
-	label_at("宝物掉落", Vector2(92, 645), 18)
+	label_at("02  /  狩猎规则", Vector2(92, 596), 18, GOLD)
+	label_at("遗物掉落", Vector2(92, 645), 18)
 	for i in range(3):
 		button_at(["低 · 15%", "中 · 30%", "高 · 50%"][i], Rect2(205 + i * 136, 636, 124, 46), func(): drop_index = i; show_menu(), drop_index == i)
-	label_at("妖怪难度", Vector2(695, 645), 18)
+	label_at("猎物难度", Vector2(695, 645), 18)
 	for i in range(4):
-		button_at(["简单", "普通", "困难", "地狱"][i], Rect2(807 + i * 126, 636, 114, 46), func(): difficulty = i; show_menu(), difficulty == i)
-	button_at("启程西行     →", Rect2(1030, 760, 320, 68), start_run, true)
-	label_at("WASD 移动   /   左键连击 · 右键重击   /   空格闪避", Vector2(92, 772), 17, Color("94a8ad"))
-	label_at("无限叠层 · 属性封顶300% · 每3分钟难度提升", Vector2(92, 806), 15, Color("657f87"))
+		button_at(["浅猎", "夜巡", "血月", "噩梦"][i], Rect2(807 + i * 126, 636, 114, 46), func(): difficulty = i; show_menu(), difficulty == i)
+	button_at("开始狩猎     →", Rect2(1030, 760, 320, 68), start_run, true)
+	label_at("WASD 移动   /   左键连击 · 右键重击   /   空格侧步", Vector2(92, 772), 17, Color("8a7a66"))
+	label_at("无限叠层 · 属性封顶300% · 每3分钟猎场加深", Vector2(92, 806), 15, Color("5a4a42"))
+	if hades:
+		hades.set_active(false)
+	if pixel_cover:
+		pixel_cover.visible = true
 	queue_redraw()
 
 func start_run() -> void:
@@ -168,6 +180,8 @@ func start_run() -> void:
 	inventory_open = false
 	hp = stat("hp")
 	mode = "play"
+	if pixel_cover:
+		pixel_cover.visible = false
 	build_hud()
 	generate_stage()
 
@@ -193,7 +207,7 @@ func build_hud() -> void:
 	detail = label_at("", Vector2(1020, 36), 18)
 	notice = label_at("", Vector2(470, 145), 23, GOLD)
 	panel(Rect2(24, 828, 1392, 52), Color("101e2bef"))
-	label_at("WASD 移动    左键 / J 连击    右键 / K 重击    空格 闪避    E 下一关    Tab 宝物    Esc 暂停", Vector2(44, 843), 17, Color("b4c6c8"))
+	label_at("WASD 移动    左键 / J 连击    右键 / K 重击    空格 侧步    E 下一猎场    Tab 遗物    Esc 暂停", Vector2(44, 843), 17, Color("b4c6c8"))
 
 func generate_stage() -> void:
 	art.load_stage(stage)
@@ -220,8 +234,10 @@ func generate_stage() -> void:
 	player = rooms[0].get_center()
 	camera_offset = Vector2(720, 455) - player
 	portal_pos = rooms[-1].get_center()
+	if hades:
+		hades.rebuild()
 	refresh_hud()
-	toast("第 %d 重天 · %s" % [stage + 1, Data.STAGES[stage][0]])
+	toast("第 %d 夜 · %s" % [stage + 1, Data.STAGES[stage][0]])
 
 func walkable(pos: Vector2) -> bool:
 	for rect in rooms:
@@ -251,7 +267,7 @@ func spawn_wave() -> void:
 		var health = (600.0 if boss else 42.0) * factor * (1 + int(elapsed / 180.0) * 0.2)
 		enemy_serial += 1
 		enemies.append({"id": enemy_serial, "knockback": Vector2.ZERO, "stun": 0.0, "windup": 0.0, "windup_max": 1.0, "target": pos, "attack_origin": pos, "pos": pos, "hp": health, "max_hp": health, "boss": boss, "damage": (22 if boss else 9) * factor * (1 + int(elapsed / 180.0) * 0.15), "speed": 74.0 + stage * 7 + (15 if boss else rng.randf_range(0, 25)), "hit": 0.0, "skill": 2.0, "burn": 0.0, "hidden": not boss and i % 5 == 4, "path": [], "path_timer": 0.0})
-	toast(("妖王现身 · " + Data.STAGES[stage][2]) if boss else "第 %d 波 · 妖气涌动" % wave)
+	toast(("猎场之主 · " + Data.STAGES[stage][2]) if boss else "第 %d 波 · 兽潮将至" % wave)
 
 # Navigate via room/corridor centers, with a small visibility graph for reliable pursuit.
 func visible_path(a: Vector2, b: Vector2) -> bool:
@@ -289,8 +305,29 @@ func route(a: Vector2, b: Vector2) -> Array:
 				frontier.append(j)
 	return [a]
 
+func _toggle_fullscreen() -> void:
+	# Borderless fullscreen. Exclusive mode (Alt+Enter default) hard-crashes
+	# OpenGL Compatibility on several NVIDIA laptops when the swap chain resizes.
+	if DisplayServer.window_get_mode() == DisplayServer.WINDOW_MODE_WINDOWED:
+		DisplayServer.window_set_mode(DisplayServer.WINDOW_MODE_FULLSCREEN)
+	else:
+		DisplayServer.window_set_mode(DisplayServer.WINDOW_MODE_WINDOWED)
+
+func _is_fullscreen_toggle(event: InputEvent) -> bool:
+	if not (event is InputEventKey) or not event.pressed or event.echo:
+		return false
+	return event.keycode == KEY_F11 or (event.alt_pressed and event.keycode == KEY_ENTER)
+
+func _input(event: InputEvent) -> void:
+	if _is_fullscreen_toggle(event):
+		_toggle_fullscreen()
+		get_viewport().set_input_as_handled()
+
 func _unhandled_key_input(event: InputEvent) -> void:
 	if not event.is_pressed() or event.is_echo(): return
+	if _is_fullscreen_toggle(event):
+		_toggle_fullscreen()
+		return
 	if mode == "chapter":
 		if event.keycode == KEY_E: advance_stage()
 		return
@@ -318,13 +355,13 @@ func show_stage_clear() -> void:
 	combat.reset()
 	fresh_screen()
 	panel(Rect2(330, 175, 780, 530), Color("10212af5"))
-	label_at("第 %d 关 / 已通过" % (stage + 1), Vector2(385, 215), 20, GOLD)
-	label_at(Data.STAGES[stage][0] + " · 妖王已伏", Vector2(385, 265), 39)
-	label_at("下一站", Vector2(385, 353), 18, Color("93aaa9"))
-	label_at("第 %d 关 · %s" % [stage + 2, Data.STAGES[stage + 1][0]], Vector2(385, 387), 32, GOLD)
-	label_at("""携带 %d 件宝物继续西行 · 角色与属性保留
-本关场景结束，进入下一片天地。""" % total_items(), Vector2(385, 456), 20)
-	button_at("进入下一关  →  [E]", Rect2(385, 580, 670, 66), advance_stage, true)
+	label_at("第 %d 夜 / 已猎过" % (stage + 1), Vector2(385, 215), 20, GOLD)
+	label_at(Data.STAGES[stage][0] + " · 猎物已伏", Vector2(385, 265), 39)
+	label_at("下一猎场", Vector2(385, 353), 18, Color("8a7a66"))
+	label_at("第 %d 夜 · %s" % [stage + 2, Data.STAGES[stage + 1][0]], Vector2(385, 387), 32, GOLD)
+	label_at("""携带 %d 件遗物继续狩猎 · 猎人与属性保留
+本夜结束，踏入下一片雾街。""" % total_items(), Vector2(385, 456), 20)
+	button_at("进入下一猎场  →  [E]", Rect2(385, 580, 670, 66), advance_stage, true)
 	queue_redraw()
 
 func advance_stage() -> void:
@@ -341,7 +378,7 @@ func advance_stage() -> void:
 func show_overlay() -> void:
 	fresh_screen()
 	panel(Rect2(170, 85, 1100, 715), Color("10212afa"))
-	label_at("行囊 · 宝物" if inventory_open else "暂停 · 稍作歇息", Vector2(210, 110), 34, GOLD)
+	label_at("行囊 · 遗物" if inventory_open else "暂停 · 灯火暂歇", Vector2(210, 110), 34, GOLD)
 	var stats_text = "攻击 %.0f    攻速 %.2f/s    移速 %.0f    暴击 %.0f%%    回复 %.1f/s" % [stat("damage"), stat("rate"), stat("speed"), stat("crit") * 100, stat("regen")]
 	label_at(stats_text, Vector2(210, 165), 18)
 	var scroll = ScrollContainer.new()
@@ -354,7 +391,7 @@ func show_overlay() -> void:
 	scroll.add_child(box)
 	if inventory.is_empty():
 		var empty = Label.new()
-		empty.text = "行囊尚空。击败妖怪，拾取它们掉落的宝物。"
+		empty.text = "行囊尚空。击败猎物，拾取它们掉落的遗物。"
 		box.add_child(empty)
 	for id in inventory:
 		var line = Label.new()
@@ -362,16 +399,22 @@ func show_overlay() -> void:
 		line.add_theme_color_override("font_color", Data.RARITY_COLORS[Data.ITEMS[id][1]])
 		line.add_theme_font_size_override("font_size", 19)
 		box.add_child(line)
-	button_at("继续西行", Rect2(210, 698, 250, 58), func(): paused = false; inventory_open = false; build_hud(), true)
-	button_at("返回启程界面", Rect2(950, 698, 270, 58), show_menu)
+	button_at("继续狩猎", Rect2(210, 698, 250, 58), func(): paused = false; inventory_open = false; build_hud(), true)
+	button_at("返回猎人选择", Rect2(950, 698, 270, 58), show_menu)
 
 func _process(delta: float) -> void:
 	if mode != "play" or paused:
+		if hades:
+			hades.set_active(mode == "play")
+			if mode == "play":
+				hades.sync()
 		queue_redraw()
 		return
 	fx.tick(delta)
 	if combat.presentation_tick(delta):
 		camera_offset = Vector2(720, 455) - player + combat.camera_shake()
+		if hades:
+			hades.sync()
 		queue_redraw()
 		return
 	var old_tier = int(elapsed / 180.0)
@@ -395,8 +438,13 @@ func _process(delta: float) -> void:
 		player = move_actor(player, direction * stat("speed") * delta * (0.65 if not combat.swing.is_empty() else 1.0))
 	fx.motion(previous_position, player)
 	camera_offset = Vector2(720, 455) - player + combat.camera_shake()
-	aim = (get_global_mouse_position() - camera_offset - player).normalized()
-	if aim.length_squared() < 0.1: aim = Vector2.RIGHT
+	if hades and hades.camera and hades.camera.current:
+		aim = (hades.pick_ground() - player)
+	else:
+		aim = (get_global_mouse_position() - camera_offset - player)
+	aim = aim.normalized() if aim.length_squared() > 0.1 else Vector2.RIGHT
+	if hades:
+		hades.sync()
 	if Input.is_mouse_button_pressed(MOUSE_BUTTON_RIGHT) or Input.is_physical_key_pressed(KEY_K):
 		combat.begin_attack(true)
 	elif Input.is_mouse_button_pressed(MOUSE_BUTTON_LEFT) or Input.is_physical_key_pressed(KEY_J):
@@ -423,7 +471,7 @@ func _process(delta: float) -> void:
 		if transition_timer <= 0:
 			if boss_spawned:
 				portal = true
-				toast("妖王已伏 · 前往金色法阵，按 E 继续")
+				toast("猎物已伏 · 前往血色法阵，按 E 继续")
 			else:
 				spawn_wave()
 				transition_timer = 2.5
@@ -432,7 +480,7 @@ func _process(delta: float) -> void:
 			revive_charges -= 1
 			hp = stat("hp")
 			invulnerable = 3.0
-			toast("九转还魂 · 重获新生")
+			toast("还魂血丹 · 猎人再起")
 		else:
 			finish(false)
 			return
@@ -440,8 +488,8 @@ func _process(delta: float) -> void:
 	queue_redraw()
 
 func refresh_hud() -> void:
-	hud.text = "%s   /   %s\n生命  %d / %d     宝物 %d 件" % [Data.HEROES[hero_id].name, Data.STAGES[stage][0], ceili(hp), int(stat("hp")), total_items()]
-	detail.text = "%02d:%02d   难度 %d · %s\n%s   剩余妖怪 %d   闪避 %s" % [int(elapsed) / 60, int(elapsed) % 60, 1 + int(elapsed / 180), ["简单", "普通", "困难", "地狱"][difficulty], "妖王战" if boss_spawned else "波次 %d / %d" % [wave, 2 if stage == 5 else 3], enemies.size(), "就绪" if dash_cooldown <= 0 else "%.1fs" % dash_cooldown]
+	hud.text = "%s   /   %s\n生命  %d / %d     遗物 %d 件" % [Data.HEROES[hero_id].name, Data.STAGES[stage][0], ceili(hp), int(stat("hp")), total_items()]
+	detail.text = "%02d:%02d   难度 %d · %s\n%s   剩余猎物 %d   侧步 %s" % [int(elapsed) / 60, int(elapsed) % 60, 1 + int(elapsed / 180), ["浅猎", "夜巡", "血月", "噩梦"][difficulty], "猎主战" if boss_spawned else "波次 %d / %d" % [wave, 2 if stage == 5 else 3], enemies.size(), "就绪" if dash_cooldown <= 0 else "%.1fs" % dash_cooldown]
 
 
 func advance_difficulty(old_tier: int, new_tier: int) -> void:
@@ -451,7 +499,7 @@ func advance_difficulty(old_tier: int, new_tier: int) -> void:
 		enemy.hp *= health_ratio
 		enemy.max_hp *= health_ratio
 		enemy.damage *= attack_ratio
-	toast("劫数加深 · 难度 %d · 妖怪生命与攻击提升" % (new_tier + 1))
+	toast("血月加深 · 难度 %d · 猎物生命与攻击提升" % (new_tier + 1))
 
 func hit_enemy(enemy: Dictionary, damage: float) -> void:
 	var crit = stat("crit")
@@ -501,7 +549,7 @@ func collect(id: int, copied: bool = false) -> void:
 	if id == 17:
 		var options = inventory.keys().filter(func(key): return key != 17)
 		if not options.is_empty(): collect(options[rng.randi_range(0, options.size() - 1)], true)
-	toast(("变化复制 · " if copied else "获得 · ") + Data.ITEMS[id][0] + "  ×" + str(stacks(id)))
+	toast(("血契摹写 · " if copied else "获得 · ") + Data.ITEMS[id][0] + "  ×" + str(stacks(id)))
 
 func total_items() -> int:
 	var total = 0
@@ -516,48 +564,26 @@ func finish(won: bool) -> void:
 	mode = "end"
 	fresh_screen()
 	panel(Rect2(380, 200, 680, 460), Color("10212af5"))
-	label_at("功成 · 问道西天" if won else "此劫未渡", Vector2(440, 255), 48, GOLD)
-	label_at("%s走过了 %d 重天地\n历时 %02d:%02d · 降伏 %d 只妖怪\n累计宝物 %d 件 · 下一次，再续传奇。" % [Data.HEROES[hero_id].name, mini(stage + 1, 6), int(elapsed) / 60, int(elapsed) % 60, kills, total_items()], Vector2(440, 355), 24)
-	button_at("再次启程  →", Rect2(440, 540, 550, 65), show_menu, true)
+	label_at("夜尽 · 契约仍在" if won else "猎人倒下了", Vector2(440, 255), 48, GOLD)
+	label_at("%s走过了 %d 处猎场\n历时 %02d:%02d · 猎杀 %d 头猎物\n累计遗物 %d 件 · 再猎一次。" % [Data.HEROES[hero_id].name, mini(stage + 1, 6), int(elapsed) / 60, int(elapsed) % 60, kills, total_items()], Vector2(440, 355), 24)
+	button_at("再次狩猎  →", Rect2(440, 540, 550, 65), show_menu, true)
 	queue_redraw()
 
 func _draw() -> void:
-	draw_rect(Rect2(0, 0, 1440, 900), INK)
-	if mode == "menu":
-		art.menu_background()
-		for i in range(7):
-			draw_arc(Vector2(1200, 135), 80 + i * 32, 0, TAU, 100, Color(0.6, 0.65, 0.5, 0.055), 1)
+	if mode == "menu" or mode == "end" or mode == "chapter":
+		draw_rect(Rect2(0, 0, 1440, 900), INK)
+		if mode == "menu":
+			art.menu_background()
+			for i in range(7):
+				draw_arc(Vector2(1200, 135), 80 + i * 32, 0, TAU, 100, Color(0.6, 0.65, 0.5, 0.055), 1)
 		return
-	art.environment()
+	# Play mode: 3D world is the scene. Only screen-space HUD stays on the 2D canvas.
 	var tint: Color = Data.STAGES[mini(stage, 5)][3]
-	combat.draw_warnings()
-	if portal:
-		draw_arc(portal_pos, 55 + sin(elapsed * 3) * 4, 0, TAU, 64, GOLD, 3)
-		draw_arc(portal_pos, 42, -elapsed, TAU - elapsed - 0.5, 48, GOLD, 2)
-		draw_string(font, portal_pos + Vector2(-52, -70), "E · " + ("完成取经" if stage == 5 else "踏入下一关"), HORIZONTAL_ALIGNMENT_LEFT, -1, 18, GOLD)
-	for item in loot:
-		var color: Color = Data.RARITY_COLORS[Data.ITEMS[item.id][1]]
-		draw_circle(item.pos, 19, Color(color, 0.12))
-		draw_colored_polygon(PackedVector2Array([item.pos + Vector2(0, -11), item.pos + Vector2(9, 0), item.pos + Vector2(0, 11), item.pos + Vector2(-9, 0)]), color)
-		if item.pos.distance_to(player) < 130: draw_string(font, item.pos + Vector2(-32, -25), Data.ITEMS[item.id][0], HORIZONTAL_ALIGNMENT_LEFT, -1, 15, color)
-	fx.draw_ground()
-	art.characters()
-	combat.draw_swing()
-	combat.draw_particles()
-	fx.draw_hits()
-	for effect in effects:
-		if effect.has("ring"):
-			draw_arc(effect.pos, effect.ring * (1.2 - effect.life / effect.max * 0.2), 0, TAU, 48, Color(effect.color, effect.life / effect.max), 5)
-		elif effect.get("hazard", false):
-			draw_circle(effect.pos, 65, Color(effect.color, 0.15 if effect.life > 0.3 else 0.5))
-			draw_arc(effect.pos, 65, 0, TAU, 40, effect.color, 2)
-		else: draw_string(font, effect.pos + Vector2(0, -28 * (1 - effect.life / effect.max)), effect.text, HORIZONTAL_ALIGNMENT_LEFT, -1, 20, effect.color)
-	art.atmosphere()
-	if combat.flash > 0: draw_rect(Rect2(0, 0, 1440, 900), Color(1, 0.83, 0.5, combat.flash))
+	if combat.flash > 0:
+		draw_rect(Rect2(0, 0, 1440, 900), Color(1, 0.83, 0.5, combat.flash))
 	if not combat.swing.is_empty():
-		draw_string(font, Vector2(600, 785), "重击 · 破阵" if combat.swing.heavy else ["", "一式 · 起棍", "二式 · 横扫", "三式 · 震岳"][combat.combo], HORIZONTAL_ALIGNMENT_LEFT, -1, 24, GOLD)
+		draw_string(font, Vector2(600, 785), "重击 · 开刃" if combat.swing.heavy else ["", "一式 · 短锯", "二式 · 回转", "三式 · 开刃"][combat.combo], HORIZONTAL_ALIGNMENT_LEFT, -1, 24, GOLD)
 	draw_string(font, Vector2(44, 790), "重击  " + ("就绪" if combat.heavy_cooldown <= 0 else "%.1fs" % combat.heavy_cooldown), HORIZONTAL_ALIGNMENT_LEFT, -1, 18, GOLD)
-	# Compact map, showing all rooms and current enemies; hidden enemies need true sight.
 	draw_rect(Rect2(1210, 670, 206, 140), Color("0a121cdd"))
 	for r in rooms: draw_rect(Rect2(Vector2(1220, 681) + r.position * 0.11, r.size * 0.11), tint)
 	for c in corridors: draw_rect(Rect2(Vector2(1220, 681) + c.position * 0.11, c.size * 0.11), tint.darkened(0.3))

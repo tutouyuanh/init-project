@@ -1,0 +1,11 @@
+{
+  "__version__": "1.0.12",
+  "modules": {
+    "configs": {
+      "defaultConfig": {
+        "name": "Default Config",
+        "cache": {}
+      }
+    }
+  }
+}

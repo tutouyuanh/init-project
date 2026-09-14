@@ -1,0 +1,19 @@
+{
+  "name": "crimson-covenant",
+  "uuid": "7f3c2a91-4b6e-4d12-9f0a-1c8e5b7d2a44",
+  "version": "3.8.5",
+  "creator": {
+    "version": "3.8.5"
+  },
+  "description": "Crimson Covenant — gothic 2D action-roguelike for Cocos Creator 3.8 / WeChat minigame",
+  "scripts": {
+    "preview": "python -m http.server 4173 --directory preview",
+    "sprites": "python tools/gen_sprites.py",
+    "metas": "python tools/gen_metas.py",
+    "bundle": "node tools/emit_sim.mjs",
+    "smoke": "node tools/smoke_sim.mjs"
+  },
+  "dependencies": {
+    "esbuild": "^0.25.0"
+  }
+}

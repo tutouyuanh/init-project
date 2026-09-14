@@ -1,0 +1,11 @@
+library/
+temp/
+local/
+build/
+profiles/
+node_modules/
+.idea/
+.vscode/
+*.log
+.DS_Store
+Thumbs.db

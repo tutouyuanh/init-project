@@ -1,0 +1,404 @@
+{
+  "anims": {
+    "hunter/idle_short": {
+      "count": 4,
+      "w": 96,
+      "h": 80,
+      "files": [
+        "hunter/idle_short/00.png",
+        "hunter/idle_short/01.png",
+        "hunter/idle_short/02.png",
+        "hunter/idle_short/03.png"
+      ]
+    },
+    "hunter/idle_long": {
+      "count": 4,
+      "w": 96,
+      "h": 80,
+      "files": [
+        "hunter/idle_long/00.png",
+        "hunter/idle_long/01.png",
+        "hunter/idle_long/02.png",
+        "hunter/idle_long/03.png"
+      ]
+    },
+    "hunter/walk_short": {
+      "count": 6,
+      "w": 96,
+      "h": 80,
+      "files": [
+        "hunter/walk_short/00.png",
+        "hunter/walk_short/01.png",
+        "hunter/walk_short/02.png",
+        "hunter/walk_short/03.png",
+        "hunter/walk_short/04.png",
+        "hunter/walk_short/05.png"
+      ]
+    },
+    "hunter/walk_long": {
+      "count": 6,
+      "w": 96,
+      "h": 80,
+      "files": [
+        "hunter/walk_long/00.png",
+        "hunter/walk_long/01.png",
+        "hunter/walk_long/02.png",
+        "hunter/walk_long/03.png",
+        "hunter/walk_long/04.png",
+        "hunter/walk_long/05.png"
+      ]
+    },
+    "hunter/dodge": {
+      "count": 4,
+      "w": 96,
+      "h": 80,
+      "files": [
+        "hunter/dodge/00.png",
+        "hunter/dodge/01.png",
+        "hunter/dodge/02.png",
+        "hunter/dodge/03.png"
+      ]
+    },
+    "hunter/attack_short_1": {
+      "count": 5,
+      "w": 96,
+      "h": 80,
+      "files": [
+        "hunter/attack_short_1/00.png",
+        "hunter/attack_short_1/01.png",
+        "hunter/attack_short_1/02.png",
+        "hunter/attack_short_1/03.png",
+        "hunter/attack_short_1/04.png"
+      ]
+    },
+    "hunter/attack_short_2": {
+      "count": 5,
+      "w": 96,
+      "h": 80,
+      "files": [
+        "hunter/attack_short_2/00.png",
+        "hunter/attack_short_2/01.png",
+        "hunter/attack_short_2/02.png",
+        "hunter/attack_short_2/03.png",
+        "hunter/attack_short_2/04.png"
+      ]
+    },
+    "hunter/attack_long": {
+      "count": 6,
+      "w": 96,
+      "h": 80,
+      "files": [
+        "hunter/attack_long/00.png",
+        "hunter/attack_long/01.png",
+        "hunter/attack_long/02.png",
+        "hunter/attack_long/03.png",
+        "hunter/attack_long/04.png",
+        "hunter/attack_long/05.png"
+      ]
+    },
+    "hunter/transform": {
+      "count": 5,
+      "w": 96,
+      "h": 80,
+      "files": [
+        "hunter/transform/00.png",
+        "hunter/transform/01.png",
+        "hunter/transform/02.png",
+        "hunter/transform/03.png",
+        "hunter/transform/04.png"
+      ]
+    },
+    "hunter/gun": {
+      "count": 4,
+      "w": 96,
+      "h": 80,
+      "files": [
+        "hunter/gun/00.png",
+        "hunter/gun/01.png",
+        "hunter/gun/02.png",
+        "hunter/gun/03.png"
+      ]
+    },
+    "hunter/visceral": {
+      "count": 6,
+      "w": 96,
+      "h": 80,
+      "files": [
+        "hunter/visceral/00.png",
+        "hunter/visceral/01.png",
+        "hunter/visceral/02.png",
+        "hunter/visceral/03.png",
+        "hunter/visceral/04.png",
+        "hunter/visceral/05.png"
+      ]
+    },
+    "hunter/hurt": {
+      "count": 2,
+      "w": 96,
+      "h": 80,
+      "files": [
+        "hunter/hurt/00.png",
+        "hunter/hurt/01.png"
+      ]
+    },
+    "hunter/death": {
+      "count": 4,
+      "w": 96,
+      "h": 80,
+      "files": [
+        "hunter/death/00.png",
+        "hunter/death/01.png",
+        "hunter/death/02.png",
+        "hunter/death/03.png"
+      ]
+    },
+    "beast/idle": {
+      "count": 4,
+      "w": 96,
+      "h": 64,
+      "files": [
+        "beast/idle/00.png",
+        "beast/idle/01.png",
+        "beast/idle/02.png",
+        "beast/idle/03.png"
+      ]
+    },
+    "beast/walk": {
+      "count": 6,
+      "w": 96,
+      "h": 64,
+      "files": [
+        "beast/walk/00.png",
+        "beast/walk/01.png",
+        "beast/walk/02.png",
+        "beast/walk/03.png",
+        "beast/walk/04.png",
+        "beast/walk/05.png"
+      ]
+    },
+    "beast/swipe": {
+      "count": 5,
+      "w": 96,
+      "h": 64,
+      "files": [
+        "beast/swipe/00.png",
+        "beast/swipe/01.png",
+        "beast/swipe/02.png",
+        "beast/swipe/03.png",
+        "beast/swipe/04.png"
+      ]
+    },
+    "beast/lunge": {
+      "count": 5,
+      "w": 96,
+      "h": 64,
+      "files": [
+        "beast/lunge/00.png",
+        "beast/lunge/01.png",
+        "beast/lunge/02.png",
+        "beast/lunge/03.png",
+        "beast/lunge/04.png"
+      ]
+    },
+    "beast/stagger": {
+      "count": 2,
+      "w": 96,
+      "h": 64,
+      "files": [
+        "beast/stagger/00.png",
+        "beast/stagger/01.png"
+      ]
+    },
+    "beast/death": {
+      "count": 4,
+      "w": 96,
+      "h": 64,
+      "files": [
+        "beast/death/00.png",
+        "beast/death/01.png",
+        "beast/death/02.png",
+        "beast/death/03.png"
+      ]
+    },
+    "executioner/idle": {
+      "count": 4,
+      "w": 112,
+      "h": 96,
+      "files": [
+        "executioner/idle/00.png",
+        "executioner/idle/01.png",
+        "executioner/idle/02.png",
+        "executioner/idle/03.png"
+      ]
+    },
+    "executioner/walk": {
+      "count": 6,
+      "w": 112,
+      "h": 96,
+      "files": [
+        "executioner/walk/00.png",
+        "executioner/walk/01.png",
+        "executioner/walk/02.png",
+        "executioner/walk/03.png",
+        "executioner/walk/04.png",
+        "executioner/walk/05.png"
+      ]
+    },
+    "executioner/slash": {
+      "count": 5,
+      "w": 112,
+      "h": 96,
+      "files": [
+        "executioner/slash/00.png",
+        "executioner/slash/01.png",
+        "executioner/slash/02.png",
+        "executioner/slash/03.png",
+        "executioner/slash/04.png"
+      ]
+    },
+    "executioner/shoot": {
+      "count": 3,
+      "w": 112,
+      "h": 96,
+      "files": [
+        "executioner/shoot/00.png",
+        "executioner/shoot/01.png",
+        "executioner/shoot/02.png"
+      ]
+    },
+    "executioner/stagger": {
+      "count": 2,
+      "w": 112,
+      "h": 96,
+      "files": [
+        "executioner/stagger/00.png",
+        "executioner/stagger/01.png"
+      ]
+    },
+    "executioner/death": {
+      "count": 4,
+      "w": 112,
+      "h": 96,
+      "files": [
+        "executioner/death/00.png",
+        "executioner/death/01.png",
+        "executioner/death/02.png",
+        "executioner/death/03.png"
+      ]
+    },
+    "boss/idle": {
+      "count": 4,
+      "w": 128,
+      "h": 160,
+      "files": [
+        "boss/idle/00.png",
+        "boss/idle/01.png",
+        "boss/idle/02.png",
+        "boss/idle/03.png"
+      ]
+    },
+    "boss/slam": {
+      "count": 5,
+      "w": 128,
+      "h": 160,
+      "files": [
+        "boss/slam/00.png",
+        "boss/slam/01.png",
+        "boss/slam/02.png",
+        "boss/slam/03.png",
+        "boss/slam/04.png"
+      ]
+    },
+    "boss/sweep": {
+      "count": 4,
+      "w": 128,
+      "h": 160,
+      "files": [
+        "boss/sweep/00.png",
+        "boss/sweep/01.png",
+        "boss/sweep/02.png",
+        "boss/sweep/03.png"
+      ]
+    },
+    "boss/cast": {
+      "count": 3,
+      "w": 128,
+      "h": 160,
+      "files": [
+        "boss/cast/00.png",
+        "boss/cast/01.png",
+        "boss/cast/02.png"
+      ]
+    },
+    "boss/stagger": {
+      "count": 2,
+      "w": 128,
+      "h": 160,
+      "files": [
+        "boss/stagger/00.png",
+        "boss/stagger/01.png"
+      ]
+    },
+    "boss/death": {
+      "count": 4,
+      "w": 128,
+      "h": 160,
+      "files": [
+        "boss/death/00.png",
+        "boss/death/01.png",
+        "boss/death/02.png",
+        "boss/death/03.png"
+      ]
+    }
+  },
+  "tiles": {
+    "cobble": {
+      "w": 32,
+      "h": 32
+    },
+    "brick": {
+      "w": 32,
+      "h": 32
+    },
+    "lantern": {
+      "w": 32,
+      "h": 64
+    },
+    "fence": {
+      "w": 48,
+      "h": 40
+    },
+    "backdrop": {
+      "w": 480,
+      "h": 180
+    }
+  },
+  "ui": {
+    "panel": {
+      "w": 160,
+      "h": 96
+    },
+    "bar": {
+      "w": 128,
+      "h": 12
+    },
+    "button": {
+      "w": 48,
+      "h": 48
+    }
+  },
+  "fx": {
+    "slash": {
+      "w": 48,
+      "h": 32
+    },
+    "parry": {
+      "w": 32,
+      "h": 32
+    },
+    "blood": {
+      "w": 24,
+      "h": 24
+    }
+  }
+}

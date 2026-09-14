@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
+  <title>Crimson Covenant</title>
+  <link rel="stylesheet" href="./style.css" />
+</head>
+<body>
+  <div id="wrap">
+    <header>
+      <div>
+        <p class="eyebrow">Cocos Creator 3.8 · WeChat minigame slice</p>
+        <h1>Crimson Covenant</h1>
+        <p class="sub">Gothic 2D action-roguelike. Dodge, rally, gun-rite, transforming saw.</p>
+      </div>
+      <div class="meta" id="runMeta">Night 1 · Ashwick</div>
+    </header>
+    <div id="stage">
+      <canvas id="game" width="480" height="270"></canvas>
+      <div id="overlay"></div>
+    </div>
+    <div id="hudText">
+      <div id="log"></div>
+      <div id="help">
+        <span><kbd>A</kbd><kbd>D</kbd> move</span>
+        <span><kbd>J</kbd> saw</span>
+        <span><kbd>K</kbd> gun rite</span>
+        <span><kbd>L</kbd> transform</span>
+        <span><kbd>Space</kbd> step</span>
+        <span><kbd>E</kbd> lantern / east</span>
+      </div>
+    </div>
+    <div id="pads">
+      <div class="pad-cluster">
+        <button data-k="left">◀</button>
+        <button data-k="dodge">STEP</button>
+        <button data-k="right">▶</button>
+      </div>
+      <div class="pad-cluster">
+        <button data-k="transform">FORM</button>
+        <button data-k="gun">GUN</button>
+        <button data-k="attack" class="atk">SAW</button>
+        <button data-k="interact">USE</button>
+      </div>
+    </div>
+  </div>
+  <script type="module" src="./game.js"></script>
+</body>
+</html>
